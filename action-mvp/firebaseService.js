@@ -11,11 +11,11 @@ const db = admin.firestore();
 
 let cartasCollection = db.collection('Cartas');
 
-cartasCollection.get().then((querySnapshot) => {
-    querySnapshot.forEach( document => {
-        console.log(document.data());
-    })
-})
+// cartasCollection.get().then((querySnapshot) => {
+//     querySnapshot.forEach( document => {
+//         console.log(document.data());
+//     })
+// })
 
 const saveUser = (user) => {
     db.collection("users").add({
@@ -29,10 +29,7 @@ const saveUser = (user) => {
     })
 }
 
-const user = {
-    name:'Jose',
-    age: 23,
-    email: 'jose@gmail.com',
-}
+module.exports = saveUser;
 
-saveUser(user)
+
+// saveUser(user)

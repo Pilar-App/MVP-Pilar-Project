@@ -10,7 +10,7 @@ router.get("/cartas", (req, res)=>{
     });
 });
 
-router.post("/")
+// router.post("/users")
 
 
 module.exports = router;

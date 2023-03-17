@@ -37,6 +37,11 @@ process.env.DEBUG = 'dialogflow:*'; // enables lib debugging statements
 const timeZone = 'America/Lima';
 const timeZoneOffset = '-05:00';
 
+const fireSave = require('./firebaseService');
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 
 function createCalendarEvent (dateTimeStart, dateTimeEnd, appointment_type) {
     return new Promise((resolve, reject) => {
@@ -105,6 +110,33 @@ app.post('/webhook', express.json(), function (req, res) {
         });
     }
 
+    function testNameHook(agent){
+
+        const answers = [
+            `¡Muy bien! 👏 Espero te encuentres bien hoy,${agent.parameters.person.name}🤩
+            Para asegurar la protección de tus datos, debes aceptar la política de privacidad de Google antes de seguir adelante. ¿Estás de acuerdo? 🛡️`,
+            `¡Fantástico! 🤩 ${agent.parameters.person.name}, estoy aquí para ayudarte a mejorar tu productividad 🧐
+            ¿Podrías confirmar que estás dispuesto a aceptar la política de privacidad de Google para que pueda seguir ayudándote? 🙏`,
+            `¡Perfecto, te llamaré ${agent.parameters.person.name}! 🙌
+            Para que pueda brindarte un mejor servicio, debes aceptar la política de privacidad de Google. ¿Estás dispuesto a hacerlo? 🤔`,
+            `¡Excelente, es un gusto conocerte ${agent.parameters.person.name}! 👍
+            Si deseas continuar con nuestra conversación, es necesario que aceptes la política de privacidad de Google. ¿Estás de acuerdo? 😃`
+        ]
+
+        console.log('Test Name Hook')
+        console.log(agent.parameters.person.name)
+    //     const user = {
+    //         name: String,
+    //         age: Number,
+    //         email: String,
+    //     }
+    
+    //     fireSave(user)
+    // }
+        
+        agent.add(answers[getRandomInt(answers.length)])
+        
+    }
     function testWebHook(agent){
         agent.add(`Estoy enviando este response desde el webhook`)
     }
@@ -112,6 +144,7 @@ app.post('/webhook', express.json(), function (req, res) {
     let intentMap = new Map();
     intentMap.set('Gestion de citas', makeAppointment);
     intentMap.set('TestWebHook', testWebHook);
+    intentMap.set('2Nombre_usuario', testNameHook);
     agent.handleRequest(intentMap);
 })
 
