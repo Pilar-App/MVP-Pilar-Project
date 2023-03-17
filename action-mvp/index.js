@@ -37,7 +37,53 @@ process.env.DEBUG = 'dialogflow:*'; // enables lib debugging statements
 const timeZone = 'America/Lima';
 const timeZoneOffset = '-05:00';
 
-const fireSave = require('./firebaseService');
+
+// --------------------------- FIREBASE ---------------------
+
+var admin = require("firebase-admin");
+
+var keysFirebase = require(`D:/Jhomar/Pilar/MVP/MVP-Pilar-Project/action-mvp/serviceAccountKey.json`);
+
+admin.initializeApp({
+    credential: admin.credential.cert(keysFirebase)
+});
+
+const db = admin.firestore();
+
+let ans1;
+
+async function namesResponse() {
+
+    const querySnapshot = await db.collection('responses-2Nombre_usuario').get()
+    // console.log(querySnapshot.docs[0].data())
+    
+    const ans = querySnapshot.docs.map( doc =>({
+        description: doc.data().description,
+    }))
+    return ans
+}
+
+
+namesResponse().then(
+    res => ans1 = res[getRandomInt(res.length)].description)
+
+
+const saveUser = (user) => {
+    db.collection("users").add({
+        user
+    })
+    .then(function(docRef){
+        console.log("User saved: ", docRef.id);
+    })
+    .catch(function(error){
+        console.error("Error adding document: ", error);
+    })
+}
+
+
+
+
+// -----------------------------------------------------------
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -74,12 +120,6 @@ function createCalendarEvent (dateTimeStart, dateTimeEnd, appointment_type) {
 
 // ------------------------- ENDPOINTS ----------------------------------------
 
-
-// TODO: Crear un servicio para la conexion a firestore de las respuestas del SmallTalck
-// app.post('/responses', express.json(), function (req, res) {
-    
-// }
-
 app.use('/api', require("./routes/api"));
 
 app.get('/', function (req, res) {
@@ -112,30 +152,19 @@ app.post('/webhook', express.json(), function (req, res) {
 
     function testNameHook(agent){
 
-        const answers = [
-            `¡Muy bien! 👏 Espero te encuentres bien hoy,${agent.parameters.person.name}🤩
-            Para asegurar la protección de tus datos, debes aceptar la política de privacidad de Google antes de seguir adelante. ¿Estás de acuerdo? 🛡️`,
-            `¡Fantástico! 🤩 ${agent.parameters.person.name}, estoy aquí para ayudarte a mejorar tu productividad 🧐
-            ¿Podrías confirmar que estás dispuesto a aceptar la política de privacidad de Google para que pueda seguir ayudándote? 🙏`,
-            `¡Perfecto, te llamaré ${agent.parameters.person.name}! 🙌
-            Para que pueda brindarte un mejor servicio, debes aceptar la política de privacidad de Google. ¿Estás dispuesto a hacerlo? 🤔`,
-            `¡Excelente, es un gusto conocerte ${agent.parameters.person.name}! 👍
-            Si deseas continuar con nuestra conversación, es necesario que aceptes la política de privacidad de Google. ¿Estás de acuerdo? 😃`
-        ]
+        namesResponse().then(
+            res => ans1 = res[getRandomInt(res.length)].description)
 
-        console.log('Test Name Hook')
-        console.log(agent.parameters.person.name)
-    //     const user = {
-    //         name: String,
-    //         age: Number,
-    //         email: String,
-    //     }
-    
-    //     fireSave(user)
-    // }
+        let ans2 = ans1.replace('${agent.parameters.person.name}', agent.parameters.person.name)
+        const user = {
+            name: agent.parameters.person.name,
+            age: 22,
+            email: `${agent.parameters.person.name}@gmail.com`,
+        }
         
-        agent.add(answers[getRandomInt(answers.length)])
-        
+        saveUser(user)
+
+        agent.add(ans2)
     }
     function testWebHook(agent){
         agent.add(`Estoy enviando este response desde el webhook`)
