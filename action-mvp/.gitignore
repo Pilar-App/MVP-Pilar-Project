@@ -8,6 +8,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Firebase
+serviceAccountKey
+
 node_modules
 dist
 dist-ssr

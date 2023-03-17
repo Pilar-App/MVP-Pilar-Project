@@ -69,15 +69,17 @@ function createCalendarEvent (dateTimeStart, dateTimeEnd, appointment_type) {
 
 // ------------------------- ENDPOINTS ----------------------------------------
 
-app.get('/', function (req, res) {
-    res.send('Ya volviste del bano Marko?')
-})
 
 // TODO: Crear un servicio para la conexion a firestore de las respuestas del SmallTalck
 // app.post('/responses', express.json(), function (req, res) {
     
 // }
 
+app.use('/api', require("./routes/api"));
+
+app.get('/', function (req, res) {
+    res.send('Ya volviste del bano Marko?')
+})
 
 app.post('/webhook', express.json(), function (req, res) {
     const agent = new WebhookClient({ request: req, response: res });
