@@ -9,6 +9,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Firebase
+*.json
 !serviceAccountKey.json
 
 node_modules
